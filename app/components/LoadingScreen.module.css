@@ -1,0 +1,1285 @@
+.loadingScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #4099ff;
+  font-family: 'Share Tech Mono', monospace;
+  transition: opacity 1.5s ease-in-out;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(12, 44, 77, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(30, 85, 120, 0.3) 0%, transparent 40%);
+}
+
+/* Стилизация ID корабля */
+.shipId {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: #66b3ff;
+  text-shadow: 0 0 12px rgba(64, 153, 255, 0.8);
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(64, 153, 255, 0.3);
+  width: 100%;
+  text-align: center;
+}
+
+.shipId::before, .shipId::after {
+  content: "//";
+  color: rgba(135, 206, 250, 0.8);
+  margin: 0 15px;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.6);
+}
+
+/* Иконка домика удалена по запросу */
+/* 
+.shipIcon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234099ff'%3E%3Cpath d='M12 3L4 9v12h16V9l-8-6z' stroke='%234099ff' stroke-width='0.5' stroke-linejoin='round'/%3E%3Cpath d='M9 14h6v7h-6z' fill='%234099ff'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 5px rgba(64, 153, 255, 0.7)) blur(0.2px);
+  animation: pulse 2s infinite;
+  transform: scale(1.1);
+}
+*/
+
+.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.content {
+  width: 50%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.content::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-image: 
+    linear-gradient(90deg, transparent 49%, rgba(0, 220, 130, 0.1) 50%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, rgba(0, 220, 130, 0.05) 50%, transparent 51%);
+  background-size: 50px 50px;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.terminal {
+  width: 100%;
+  height: 300px;
+  background-color: rgba(0, 18, 36, 0.8);
+  border: 1px solid #1a5d8c;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 30px;
+  overflow-y: auto;
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.2),
+    inset 0 0 30px rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+
+/* Стилизация скроллбара для терминала */
+.terminal::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.terminal::-webkit-scrollbar-track {
+  background: rgba(10, 25, 50, 0.3);
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+  margin: 3px 0;
+}
+
+.terminal::-webkit-scrollbar-thumb {
+  background-image: -webkit-linear-gradient(
+    top,
+    rgba(64, 153, 255, 0.7) 0%,
+    rgba(72, 255, 237, 0.7) 50%,
+    rgba(64, 153, 255, 0.7) 100%
+  );
+  background-image: linear-gradient(
+    to bottom,
+    rgba(64, 153, 255, 0.7) 0%,
+    rgba(72, 255, 237, 0.7) 50%,
+    rgba(64, 153, 255, 0.7) 100%
+  );
+  border-radius: 4px;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  -webkit-box-shadow: 0 0 5px rgba(72, 255, 237, 0.5);
+  box-shadow: 0 0 5px rgba(72, 255, 237, 0.5);
+}
+
+.terminal::-webkit-scrollbar-thumb:hover {
+  background-image: -webkit-linear-gradient(
+    top,
+    rgba(64, 153, 255, 0.9) 0%,
+    rgba(72, 255, 237, 0.9) 50%,
+    rgba(64, 153, 255, 0.9) 100%
+  );
+  background-image: linear-gradient(
+    to bottom,
+    rgba(64, 153, 255, 0.9) 0%,
+    rgba(72, 255, 237, 0.9) 50%,
+    rgba(64, 153, 255, 0.9) 100%
+  );
+  -webkit-box-shadow: 0 0 8px rgba(72, 255, 237, 0.7);
+  box-shadow: 0 0 8px rgba(72, 255, 237, 0.7);
+}
+
+/* Firefox scrollbar */
+@supports (scrollbar-width: thin) {
+  .terminal {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(64, 153, 255, 0.7) rgba(10, 25, 50, 0.3);
+  }
+}
+
+.terminal::before {
+  content: "ADNOS :: SYSTEM RECOVERY";
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background-color: #000;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #66b3ff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.5);
+}
+
+.terminal::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(64, 153, 255, 0.5), 
+    transparent
+  );
+}
+
+.logs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.logEntry {
+  display: flex;
+  opacity: 0;
+  animation: fadeIn 0.5s forwards;
+  position: relative;
+  padding-left: 5px;
+}
+
+.logEntry:hover {
+  background-color: rgba(64, 153, 255, 0.05);
+  transform: scale(1.01);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.timestamp {
+  color: #4099ff;
+  margin-right: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  text-shadow: 0 0 5px rgba(64, 153, 255, 0.5);
+}
+
+.logText {
+  color: #a6d2ff;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 10px rgba(135, 206, 250, 0.3);
+}
+
+.cursor {
+  width: 10px;
+  height: 16px;
+  background-color: #4099ff;
+  margin-top: 10px;
+  animation: blink 1s infinite;
+  box-shadow: 0 0 8px rgba(64, 153, 255, 0.7);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+.progressContainer {
+  width: 100%;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 0 5px;
+}
+
+.progressHeader span {
+  font-size: 14px;
+  color: #66b3ff;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.5);
+  font-weight: bold;
+}
+
+.progressPercent {
+  color: #4099ff !important;
+  font-size: 16px !important;
+  animation: pulse-text 2s infinite;
+}
+
+@keyframes pulse-text {
+  0%, 100% { text-shadow: 0 0 8px rgba(64, 153, 255, 0.5); }
+  50% { text-shadow: 0 0 15px rgba(64, 153, 255, 0.8); }
+}
+
+.progressContainer::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(64, 153, 255, 0.2), 
+    transparent
+  );
+}
+
+.progressContainer::after {
+  content: "";
+  position: absolute;
+  bottom: -15px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(64, 153, 255, 0.2), 
+    transparent
+  );
+}
+
+.progressBar {
+  width: 100%;
+  height: 20px;
+  background-color: rgba(0, 15, 30, 0.8);
+  border: 1px solid #1a5d8c;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.2),
+    inset 0 0 10px rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+
+.progressBar::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 10%,
+    rgba(64, 153, 255, 0.05) 10%,
+    rgba(64, 153, 255, 0.05) 20%,
+    transparent 20%,
+    transparent 30%,
+    rgba(64, 153, 255, 0.05) 30%,
+    rgba(64, 153, 255, 0.05) 40%,
+    transparent 40%,
+    transparent 50%,
+    rgba(64, 153, 255, 0.05) 50%,
+    rgba(64, 153, 255, 0.05) 60%,
+    transparent 60%,
+    transparent 70%,
+    rgba(64, 153, 255, 0.05) 70%,
+    rgba(64, 153, 255, 0.05) 80%,
+    transparent 80%,
+    transparent 90%,
+    rgba(64, 153, 255, 0.05) 90%,
+    rgba(64, 153, 255, 0.05) 100%
+  );
+  opacity: 0.3;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(to right, #0a4c8b, #4099ff);
+  transition: width 0.8s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(64, 153, 255, 0.7);
+}
+
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.progressStatus {
+  text-align: center;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: #66b3ff;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.5);
+  font-weight: bold;
+  text-transform: uppercase;
+  position: relative;
+  margin-top: 5px;
+}
+
+.progressStatus:before, .progressStatus:after {
+  content: "—";
+  margin: 0 8px;
+  color: rgba(135, 206, 250, 0.7);
+}
+
+.launchButton {
+  background-color: rgba(0, 30, 60, 0.7);
+  border: 2px solid #4099ff;
+  color: #66b3ff;
+  padding: 16px 36px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.8);
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.4),
+    inset 0 0 10px rgba(64, 153, 255, 0.2);
+  transition: all 0.3s;
+  animation: pulse 2s infinite, fadeIn 1s forwards;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonIcon {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234099ff'%3E%3Cpath d='M12 2c-5.33 4-8 8.67-8 14 0 2.21 1.79 4 4 4 1.2 0 2.27-.52 3-1.35.73.83 1.8 1.35 3 1.35 1.2 0 2.27-.52 3-1.35.73.83 1.8 1.35 3 1.35 2.21 0 4-1.79 4-4 0-5.33-2.67-10-8-14z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: drop-shadow(0 0 5px rgba(64, 153, 255, 0.7));
+}
+
+.launchButton::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    135deg, 
+    rgba(64, 153, 255, 0.5) 0%,
+    transparent 50%,
+    rgba(64, 153, 255, 0.5) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.launchButton:hover {
+  background-color: rgba(0, 50, 90, 0.8);
+  box-shadow: 0 0 25px rgba(64, 153, 255, 0.6);
+  transform: translateY(-2px);
+  letter-spacing: 3px;
+}
+
+.launchButton:hover::before {
+  opacity: 0.6;
+  animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.launchButton:active {
+  transform: scale(0.98) translateY(-1px);
+}
+
+.initialScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 40px 20px;
+  background-color: rgba(0, 18, 36, 0.8);
+  border: 1px solid #1a5d8c;
+  border-radius: 4px;
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.2),
+    inset 0 0 30px rgba(0, 0, 0, 0.7);
+  position: relative;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+.initialScreen::before {
+  content: "ADNOS :: SYSTEM DIAGNOSTICS";
+  position: absolute;
+  top: -12px;
+  left: 20px;
+  background-color: #000;
+  padding: 0 10px;
+  font-size: 14px;
+  color: #66b3ff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(64, 153, 255, 0.5);
+}
+
+.initialScreen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(64, 153, 255, 0.5), 
+    transparent
+  );
+}
+
+.systemError {
+  margin-bottom: 30px;
+}
+
+.systemError h2 {
+  color: #ff6b6b;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+  letter-spacing: 2px;
+  animation: errorPulse 2s infinite;
+}
+
+@keyframes errorPulse {
+  0%, 100% { text-shadow: 0 0 10px rgba(255, 107, 107, 0.5); }
+  50% { text-shadow: 0 0 20px rgba(255, 107, 107, 0.8); }
+}
+
+.systemError p {
+  color: #a6d2ff;
+  font-size: 16px;
+  margin: 10px 0;
+  line-height: 1.5;
+}
+
+.repairButton {
+  background-color: rgba(0, 30, 60, 0.7);
+  border: 2px solid #ff6b6b;
+  color: #ff9f9f;
+  padding: 14px 28px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(255, 107, 107, 0.8);
+  box-shadow: 
+    0 0 15px rgba(255, 107, 107, 0.4),
+    inset 0 0 10px rgba(255, 107, 107, 0.2);
+  transition: all 0.3s;
+  margin-top: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.repairButton::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  background-image: linear-gradient(
+    135deg, 
+    rgba(255, 107, 107, 0.5) 0%,
+    transparent 50%,
+    rgba(255, 107, 107, 0.5) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.repairButton:hover {
+  background-color: rgba(60, 0, 0, 0.7);
+  box-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+  transform: translateY(-2px);
+}
+
+.repairButton:hover::before {
+  opacity: 0.6;
+  animation: rotate 3s linear infinite;
+}
+
+.repairButton:active {
+  transform: scale(0.98) translateY(-1px);
+}
+
+/* Добавляю новые стили для анимации восстановления систем */
+
+/* Эффект сканирующих линий на весь экран */
+.scanLines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 1px,
+    rgba(0, 140, 255, 0.04) 2px,
+    rgba(0, 140, 255, 0.03) 3px
+  );
+  pointer-events: none;
+  z-index: 1;
+  animation: scanLinesMove 10s linear infinite;
+}
+
+@keyframes scanLinesMove {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* Панели диагностики систем */
+.diagnosticPanels {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.diagnosticPanel {
+  background-color: rgba(0, 20, 40, 0.7);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+  border-radius: 4px;
+  padding: 10px 15px;
+  position: relative;
+  overflow: hidden;
+}
+
+.diagnosticPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(to bottom, 
+    rgba(64, 153, 255, 0.8), 
+    rgba(72, 255, 237, 0.8)
+  );
+  box-shadow: 0 0 10px rgba(72, 255, 237, 0.8);
+}
+
+.diagnosticTitle {
+  font-size: 12px;
+  color: rgba(173, 232, 255, 0.9);
+  margin-bottom: 8px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(64, 153, 255, 0.4);
+}
+
+.diagnosticBar {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(0, 10, 20, 0.8);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 5px;
+}
+
+.diagnosticBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+.diagnosticFill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 140, 255, 0.8) 0%,
+    rgba(0, 240, 255, 0.8) 100%
+  );
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
+}
+
+.diagnosticValue {
+  font-size: 11px;
+  color: rgba(173, 232, 255, 0.8);
+  text-align: right;
+  font-weight: bold;
+}
+
+/* Эффект сканирования внутри терминала */
+.scanningEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(72, 255, 237, 0.8),
+    transparent
+  );
+  opacity: 0.7;
+  animation: scanningMove 3s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@keyframes scanningMove {
+  0% { transform: translateY(-4px); }
+  100% { transform: translateY(300px); }
+}
+
+/* Визуализация сканирования системы */
+.systemScanContainer {
+  width: 100%;
+  margin-bottom: 20px;
+  position: relative;
+  height: 100px;
+  background-color: rgba(0, 20, 40, 0.6);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.systemScanTitle {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  font-size: 12px;
+  color: rgba(173, 232, 255, 0.9);
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(64, 153, 255, 0.4);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.systemScanStatus {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background-color: rgba(72, 255, 237, 0.2);
+  color: rgba(72, 255, 237, 0.9);
+  animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+  0% { background-color: rgba(72, 255, 237, 0.1); }
+  50% { background-color: rgba(72, 255, 237, 0.3); }
+  100% { background-color: rgba(72, 255, 237, 0.1); }
+}
+
+.systemScanVisual {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.scanTarget {
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(72, 255, 237, 0.8);
+  border-radius: 50%;
+  position: relative;
+  animation: targetPulse 3s infinite;
+}
+
+.scanTarget::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: rgba(72, 255, 237, 0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(72, 255, 237, 0.9);
+}
+
+.scanTarget::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1px dashed rgba(72, 255, 237, 0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: targetRotate 10s linear infinite;
+}
+
+@keyframes targetPulse {
+  0% { box-shadow: 0 0 0 0 rgba(72, 255, 237, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(72, 255, 237, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(72, 255, 237, 0); }
+}
+
+@keyframes targetRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.scanBeam {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 10%,
+    rgba(72, 255, 237, 0.8) 50%,
+    transparent 90%
+  );
+  box-shadow: 0 0 10px rgba(72, 255, 237, 0.8);
+  animation: scanBeamMove 3s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+}
+
+@keyframes scanBeamMove {
+  0%, 100% { left: 20%; }
+  50% { left: 80%; }
+}
+
+.scanGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(0deg, rgba(64, 153, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(64, 153, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(64, 153, 255, 0.4), inset 0 0 10px rgba(64, 153, 255, 0.2); }
+  50% { box-shadow: 0 0 25px rgba(64, 153, 255, 0.6), inset 0 0 15px rgba(64, 153, 255, 0.3); }
+}
+
+/* Стили для боковых панелей */
+
+/* Общие стили для боковых панелей */
+.sidePanelLeft, .sidePanelRight {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  background-color: rgba(0, 15, 30, 0.7);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  box-sizing: border-box;
+  opacity: 0;
+  animation: fadeInSidePanel 1s forwards;
+  animation-delay: 0.2s;
+  z-index: 1;
+  overflow: hidden;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.sidePanelLeft {
+  left: 0;
+  border-right: 1px solid rgba(64, 153, 255, 0.3);
+  transform: translateX(-50px);
+}
+
+.sidePanelRight {
+  right: 0;
+  border-left: 1px solid rgba(64, 153, 255, 0.3);
+  animation: fadeInSidePanelRight 1s forwards;
+  animation-delay: 0.2s;
+  transform: translateX(50px);
+}
+
+@keyframes fadeInSidePanel {
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInSidePanelRight {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.sideHeader {
+  font-size: 14px;
+  color: #66b3ff;
+  margin-bottom: 20px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(64, 153, 255, 0.3);
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(64, 153, 255, 0.5);
+}
+
+.sideSection {
+  margin-bottom: 25px;
+}
+
+/* Левая панель - метрики системы */
+.metricItem {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.metricLabel {
+  font-size: 11px;
+  color: rgba(173, 232, 255, 0.8);
+  margin-bottom: 5px;
+}
+
+.metricValue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #a6d2ff;
+  font-weight: bold;
+}
+
+.metricGraph {
+  width: 8px;
+  height: 40px;
+  background-color: rgba(0, 10, 20, 0.8);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-left: 10px;
+  position: relative;
+}
+
+.metricGraphFill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 140, 255, 0.8) 0%,
+    rgba(0, 240, 255, 0.8) 100%
+  );
+  border-radius: 3px;
+  transition: height 0.3s ease;
+}
+
+/* Чертежи корабля */
+.blueprintContainer {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+
+.blueprint {
+  width: 100%;
+  height: 150px;
+  background-color: rgba(0, 60, 100, 0.15);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 25 L80 50 L50 75 L20 50 Z' fill='none' stroke='rgba(64, 153, 255, 0.3)' stroke-width='1'/%3E%3Cpath d='M50 30 L70 50 L50 70 L30 50 Z' fill='none' stroke='rgba(64, 153, 255, 0.2)' stroke-width='1'/%3E%3Ccircle cx='50' cy='50' r='25' fill='none' stroke='rgba(64, 153, 255, 0.2)' stroke-width='1'/%3E%3Ccircle cx='50' cy='50' r='15' fill='none' stroke='rgba(64, 153, 255, 0.25)' stroke-width='1'/%3E%3Cline x1='0' y1='50' x2='100' y2='50' stroke='rgba(64, 153, 255, 0.3)' stroke-width='0.5'/%3E%3Cline x1='50' y1='0' x2='50' y2='100' stroke='rgba(64, 153, 255, 0.3)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 100px 100px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.blueprintScanLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(72, 255, 237, 0.8),
+    transparent
+  );
+  box-shadow: 0 0 10px rgba(72, 255, 237, 0.8);
+  animation: blueprintScan 3s linear infinite;
+}
+
+@keyframes blueprintScan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+.blueprintLabel {
+  font-size: 10px;
+  color: rgba(173, 232, 255, 0.7);
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* Индикаторы статуса */
+.statusLights {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.statusLight {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(30, 30, 30, 0.7);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+}
+
+.statusLightActive {
+  background-color: rgba(0, 255, 200, 0.6);
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.6);
+  animation: statusLightPulse 2s infinite;
+}
+
+@keyframes statusLightPulse {
+  0%, 100% { background-color: rgba(0, 255, 200, 0.6); box-shadow: 0 0 5px rgba(0, 255, 200, 0.6); }
+  50% { background-color: rgba(0, 255, 200, 0.9); box-shadow: 0 0 15px rgba(0, 255, 200, 0.9); }
+}
+
+/* Правая панель - диагностика */
+.circuitContainer {
+  width: 100%;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.circuit {
+  height: 5px;
+  width: 100%;
+  background-color: rgba(30, 30, 30, 0.7);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.circuitActive::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -20px;
+  width: 20px;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 200, 0.9),
+    transparent
+  );
+  animation: circuitFlow 3s linear infinite;
+}
+
+@keyframes circuitFlow {
+  0% { left: -20px; }
+  100% { left: 100%; }
+}
+
+.dataReadout {
+  width: 100%;
+  background-color: rgba(0, 20, 40, 0.6);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+  border-radius: 4px;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+}
+
+.dataHeader {
+  font-size: 11px;
+  color: rgba(173, 232, 255, 0.9);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(64, 153, 255, 0.3);
+  padding-bottom: 5px;
+}
+
+.dataRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dataRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(173, 232, 255, 0.8);
+}
+
+.dataStatus {
+  color: rgba(0, 255, 200, 0.9);
+  font-weight: bold;
+}
+
+/* Осциллограф */
+.oscilloscopeContainer {
+  margin-top: auto;
+  margin-bottom: 20px;
+}
+
+.oscilloscope {
+  width: 100%;
+  height: 100px;
+  background-color: rgba(0, 30, 60, 0.3);
+  border: 1px solid rgba(64, 153, 255, 0.4);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.oscilloscope::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    0deg,
+    transparent 49.5%,
+    rgba(64, 153, 255, 0.3) 50%,
+    transparent 50.5%
+  );
+  z-index: 1;
+}
+
+.oscilloscope::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 9%,
+    rgba(64, 153, 255, 0.1) 10%,
+    rgba(64, 153, 255, 0.1) 10.5%,
+    transparent 11%,
+    transparent 19%,
+    rgba(64, 153, 255, 0.1) 20%,
+    rgba(64, 153, 255, 0.1) 20.5%,
+    transparent 21%,
+    transparent 29%,
+    rgba(64, 153, 255, 0.1) 30%,
+    rgba(64, 153, 255, 0.1) 30.5%,
+    transparent 31%,
+    transparent 39%,
+    rgba(64, 153, 255, 0.1) 40%,
+    rgba(64, 153, 255, 0.1) 40.5%,
+    transparent 41%,
+    transparent 49%,
+    rgba(64, 153, 255, 0.1) 50%,
+    rgba(64, 153, 255, 0.1) 50.5%,
+    transparent 51%,
+    transparent 59%,
+    rgba(64, 153, 255, 0.1) 60%,
+    rgba(64, 153, 255, 0.1) 60.5%,
+    transparent 61%,
+    transparent 69%,
+    rgba(64, 153, 255, 0.1) 70%,
+    rgba(64, 153, 255, 0.1) 70.5%,
+    transparent 71%,
+    transparent 79%,
+    rgba(64, 153, 255, 0.1) 80%,
+    rgba(64, 153, 255, 0.1) 80.5%,
+    transparent 81%,
+    transparent 89%,
+    rgba(64, 153, 255, 0.1) 90%,
+    rgba(64, 153, 255, 0.1) 90.5%,
+    transparent 91%
+  );
+  z-index: 1;
+}
+
+.oscilloscopeLine {
+  position: relative;
+  width: 90%;
+  height: 1px;
+  background: transparent;
+  overflow: visible;
+  z-index: 2;
+}
+
+.oscilloscopeLine::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 200, 0.5),
+    rgba(0, 255, 200, 0.9),
+    rgba(0, 255, 200, 0.5)
+  );
+  box-shadow: 0 0 10px rgba(0, 255, 200, 0.8);
+  animation: oscillate 2s ease-in-out infinite;
+}
+
+@keyframes oscillate {
+  0%, 100% { transform: translateY(5px) scaleY(1); }
+  50% { transform: translateY(-5px) scaleY(1.2); }
+}
+
+.oscilloscopeLabel {
+  font-size: 10px;
+  color: rgba(173, 232, 255, 0.7);
+  text-align: center;
+  margin-top: 5px;
+}
+
+/* Шестнадцатеричный код */
+.hexCode {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-family: monospace;
+  font-size: 10px;
+}
+
+.hexRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.hexDigit {
+  color: rgba(0, 255, 200, 0.9);
+  animation: hexPulse 3s infinite;
+  animation-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.hexEmpty {
+  color: rgba(64, 153, 255, 0.3);
+}
+
+@keyframes hexPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+} 

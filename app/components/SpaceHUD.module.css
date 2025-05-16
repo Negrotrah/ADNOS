@@ -1,0 +1,2944 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Share+Tech+Mono&display=swap');
+
+.hudContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* позволяет кликать сквозь HUD */
+  z-index: 10;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: rgba(173, 232, 255, 0.95);
+  overflow: hidden;
+  text-shadow: 0 0 2px rgba(37, 124, 255, 0.6);
+  -webkit-user-select: none;
+  user-select: none;
+  
+  /* CSS-переменные, перенесенные из :root */
+  --hud-primary: rgba(87, 202, 255, 0.9);
+  --hud-secondary: rgba(36, 214, 184, 0.9);
+  --hud-accent: rgba(72, 255, 237, 0.9);
+  --hud-warning: rgba(255, 180, 60, 0.9);
+  --hud-danger: rgba(255, 56, 96, 0.9);
+  --hud-background: rgba(8, 19, 39, 0.7);
+  --hud-border: rgba(64, 153, 255, 0.4);
+  --hud-glow: rgba(37, 124, 255, 0.6);
+  --hud-text: rgba(173, 232, 255, 0.95);
+}
+
+/* Глобальный фон с эффектом сканлайнов */
+.hudContainer::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(
+      rgba(18, 29, 49, 0),
+      rgba(18, 29, 49, 0) 50%,
+      rgba(18, 29, 49, 0.02) 50%,
+      rgba(18, 29, 49, 0) 
+    );
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 30;
+  animation: scanlineAnimation 6s linear infinite;
+}
+
+/* Добавляем шумовой эффект */
+.hudContainer::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 31;
+}
+
+/* Блоки HUD с голографическим эффектом */
+.hudBox {
+  background-color: var(--hud-background);
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  padding: 15px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 
+    0 0 15px var(--hud-glow),
+    inset 0 0 8px rgba(64, 153, 255, 0.2);
+  animation: fadeIn 0.8s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Угловые элементы для худбоксов */
+.hudBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-top: 2px solid var(--hud-primary);
+  border-left: 2px solid var(--hud-primary);
+  opacity: 0.7;
+}
+
+.hudBox::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-bottom: 2px solid var(--hud-primary);
+  border-right: 2px solid var(--hud-primary);
+  opacity: 0.7;
+}
+
+/* Голографический эффект на блоках */
+.hudBox .hologramEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(135deg, 
+      rgba(64, 153, 255, 0) 0%, 
+      rgba(64, 153, 255, 0.1) 50%, 
+      rgba(64, 153, 255, 0) 100%);
+  pointer-events: none;
+  z-index: 1;
+  animation: hologramSweep 8s ease-in-out infinite;
+}
+
+/* Верхний HUD */
+.topHud {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  animation: slideDown 1s ease-out;
+}
+
+.topHud .hudBox {
+  min-width: 300px;
+  position: relative;
+}
+
+.topHud .hudBox::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 20px;
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(to right, 
+    var(--hud-primary), 
+    rgba(64, 153, 255, 0));
+  animation: glowPulse 4s infinite alternate;
+}
+
+/* Стили для новой панели времени */
+.timeBox {
+  background-color: rgba(0, 10, 30, 0.85);
+  border: 1px solid rgba(57, 137, 255, 0.4);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  padding: 0; /* Убираем отступы, чтобы внутренние элементы были расположены точнее */
+  min-width: 250px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.8s ease-out;
+  box-shadow: 
+    0 0 15px rgba(40, 107, 233, 0.3),
+    inset 0 0 20px rgba(0, 10, 40, 0.6);
+}
+
+/* Удаляем ненужные стили */
+.hudTime, .hudDate {
+  display: none;
+}
+
+.timeBoxHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(0, 15, 40, 0.6);
+  border-bottom: 1px solid rgba(57, 137, 255, 0.3);
+  position: relative;
+}
+
+.timeBoxHeader::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(57, 137, 255, 0.05), 
+    rgba(57, 137, 255, 0.5), 
+    rgba(57, 137, 255, 0.05)
+  );
+}
+
+.timeIndicator {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgba(136, 214, 255, 0.9);
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(40, 107, 233, 0.8);
+  position: relative;
+  padding-left: 12px;
+}
+
+.timeIndicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background-color: rgba(72, 255, 237, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(72, 255, 237, 0.8);
+  animation: system-pulse 2s infinite;
+}
+
+.timeSector {
+  font-size: 11px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(72, 255, 237, 0.8);
+  background-color: rgba(0, 25, 50, 0.5);
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid rgba(72, 255, 237, 0.3);
+}
+
+.timeBoxContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  position: relative;
+}
+
+.timeDigital {
+  display: flex;
+  align-items: flex-end;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.timeSegment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 2px;
+}
+
+.timeSegmentLabel {
+  font-size: 8px;
+  color: rgba(136, 214, 255, 0.7);
+  margin-bottom: 2px;
+  letter-spacing: 1px;
+}
+
+.timeDigits {
+  font-size: 26px;
+  font-weight: 700;
+  color: rgba(72, 255, 237, 0.95);
+  text-shadow: 0 0 10px rgba(72, 255, 237, 0.6);
+  min-width: 40px;
+  text-align: center;
+  position: relative;
+}
+
+.timeDigits::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(72, 255, 237, 0.3);
+}
+
+.timeSeparator {
+  font-size: 26px;
+  font-weight: 700;
+  color: rgba(136, 214, 255, 0.6);
+  text-shadow: 0 0 8px rgba(136, 214, 255, 0.4);
+  margin: 0 1px;
+  animation: blinkPulse 1s infinite;
+  align-self: flex-start;
+  margin-top: 15px;
+}
+
+@keyframes blinkPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.timeAnalog {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  margin-left: 10px;
+}
+
+.dateDisplay {
+  padding: 6px 15px 10px;
+  border-top: 1px solid rgba(57, 137, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dateLabelNow {
+  font-size: 9px;
+  color: rgba(136, 214, 255, 0.6);
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.dateValue {
+  font-size: 14px;
+  color: rgba(136, 214, 255, 0.9);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.timeDecoration {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.timeDecorationBar {
+  width: 3px;
+  height: 8px;
+  background-color: rgba(72, 255, 237, 0.7);
+  border-radius: 1px;
+}
+
+.timeDecorationBar:nth-child(2) {
+  height: 12px;
+}
+
+.timeDecorationBar:nth-child(3) {
+  height: 6px;
+  background-color: rgba(255, 100, 100, 0.7);
+}
+
+/* Левый HUD с голографическим эффектом */
+.leftHud {
+  position: absolute;
+  top: 53%;
+  left: 20px;
+  transform: translateY(-50%);
+  width: 280px;
+  animation: slideRight 1s ease-out;
+}
+
+.leftHud .hudBox {
+  width: 100%;
+}
+
+.leftHud::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 0;
+  width: 1px;
+  height: calc(100% + 60px);
+  background: linear-gradient(to bottom, 
+    rgba(64, 153, 255, 0), 
+    var(--hud-primary), 
+    rgba(64, 153, 255, 0));
+  animation: pulseOpacity 4s infinite alternate;
+}
+
+/* Правый HUD с голографическим эффектом */
+.rightHud {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  width: 280px;
+  animation: slideLeft 1s ease-out;
+}
+
+.rightHud .hudBox {
+  width: 100%;
+}
+
+.rightHud::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: 0;
+  width: 1px;
+  height: calc(100% + 60px);
+  background: linear-gradient(to bottom, 
+    rgba(64, 153, 255, 0), 
+    var(--hud-primary), 
+    rgba(64, 153, 255, 0));
+  animation: pulseOpacity 4s infinite alternate;
+}
+
+/* Заголовки и Информация с усовершенствованным дизайном */
+.hudTitle {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  color: var(--hud-primary);
+  margin-bottom: 15px;
+  text-shadow: 0 0 5px var(--hud-glow);
+  border-bottom: 1px solid var(--hud-border);
+  padding-bottom: 5px;
+  position: relative;
+}
+
+.hudTitle::before {
+  content: '[';
+  position: absolute;
+  left: -10px;
+  top: -1px;
+  color: var(--hud-secondary);
+  opacity: 0.7;
+}
+
+.hudTitle::after {
+  content: ']';
+  position: absolute;
+  right: -10px;
+  top: -1px;
+  color: var(--hud-secondary);
+  opacity: 0.7;
+}
+
+.hudInfo {
+  margin-bottom: 15px;
+  line-height: 1.5;
+  position: relative;
+  padding: 5px;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.hudInfo:hover {
+  background-color: rgba(64, 153, 255, 0.1);
+}
+
+.hudLabel {
+  font-weight: bold;
+  color: var(--hud-secondary);
+  margin-right: 10px;
+  display: inline-block;
+  min-width: 70px;
+  position: relative;
+}
+
+.hudLabel::after {
+  content: '>';
+  margin-left: 5px;
+  color: var(--hud-secondary);
+  font-size: 12px;
+  animation: blink 4s infinite;
+}
+
+.hudValue {
+  color: var(--hud-text);
+  text-shadow: 0 0 3px rgba(173, 216, 230, 0.3);
+  letter-spacing: 1px;
+  transition: color 0.3s;
+}
+
+.hudValueActive {
+  color: var(--hud-accent);
+  text-shadow: 0 0 5px rgba(54, 215, 183, 0.8);
+  position: relative;
+  font-weight: bold;
+}
+
+.hudValueActive::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    var(--hud-accent), 
+    transparent);
+  animation: pulseOpacity 2s infinite;
+}
+
+/* Координаты с усовершенствованным дизайном */
+.coordinateRow {
+  margin-bottom: 8px;
+  display: flex;
+  position: relative;
+  padding: 3px 5px 3px 12px;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+
+.coordinateRow:hover {
+  background-color: rgba(64, 153, 255, 0.15);
+  transform: translateX(3px);
+}
+
+.coordinateRow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 70%;
+  background-color: var(--hud-secondary);
+  box-shadow: 0 0 5px var(--hud-glow);
+}
+
+/* Прогресс бары с продвинутым дизайном */
+.progressContainer {
+  margin: 18px 0;
+  position: relative;
+}
+
+.progressLabel {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--hud-text);
+  position: relative;
+  padding-left: 15px;
+  letter-spacing: 1px;
+}
+
+.progressLabel::before {
+  content: '■';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 10px;
+  color: var(--hud-secondary);
+  animation: blink 3s infinite alternate;
+}
+
+.progressBar {
+  height: 12px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 5px;
+  border: 1px solid var(--hud-border);
+  position: relative;
+}
+
+.progressBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.4), 
+    transparent);
+  z-index: 2;
+}
+
+.progressBar::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(0, 0, 0, 0.4), 
+    transparent);
+  z-index: 2;
+}
+
+.progressFill {
+  height: 100%;
+  background: 
+    linear-gradient(to right, 
+      var(--hud-secondary), 
+      var(--hud-accent));
+  transition: width 0.5s ease, background-color 0.5s ease;
+  box-shadow: 0 0 8px rgba(54, 215, 183, 0.6);
+  position: relative;
+  z-index: 1;
+}
+
+/* Уникальный шевронный дизайн внутри полосы прогресса */
+.progressFill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.1) 10px,
+      transparent 10px,
+      transparent 20px
+    );
+  z-index: 1;
+  animation: moveChevron 20s linear infinite;
+}
+
+.progressFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+  z-index: 2;
+}
+
+.progressValue {
+  font-size: 12px;
+  text-align: right;
+  color: var(--hud-text);
+  position: relative;
+  margin-top: 3px;
+  font-weight: 500;
+}
+
+.progressValue::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(64, 153, 255, 0.3), 
+    transparent);
+}
+
+/* Скорость с продвинутым футуристическим дизайном */
+.speedInfo {
+  margin-bottom: 15px;
+  position: relative;
+  padding: 5px;
+}
+
+.speedDirection {
+  margin-bottom: 12px;
+  position: relative;
+  padding-left: 20px;
+  font-size: 15px;
+}
+
+.speedDirection::before {
+  content: '►';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 10px;
+  color: var(--hud-accent);
+  animation: blinkFast 1s infinite;
+}
+
+.direction {
+  color: var(--hud-text);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: rgba(173, 216, 230, 0.05);
+}
+
+.directionActive {
+  color: var(--hud-accent);
+  text-shadow: 0 0 5px rgba(64, 153, 255, 0.8);
+  background-color: rgba(72, 255, 237, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(72, 255, 237, 0.3);
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.speedBarContainer {
+  margin-top: 15px;
+  position: relative;
+  padding: 5px;
+  background-color: rgba(8, 19, 39, 0.3);
+  border-radius: 5px;
+  border: 1px solid rgba(64, 153, 255, 0.2);
+}
+
+.speedBarContainer::before {
+  content: 'VELOCITY';
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  font-size: 8px;
+  background-color: rgba(8, 19, 39, 0.8);
+  padding: 0 5px;
+  color: var(--hud-secondary);
+  letter-spacing: 1px;
+}
+
+.speedLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 12px;
+  color: var(--hud-text);
+  opacity: 0.8;
+}
+
+.speedBar {
+  height: 14px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 7px;
+  overflow: hidden;
+  margin-bottom: 5px;
+  border: 1px solid var(--hud-border);
+  position: relative;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.speedBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent);
+  z-index: 2;
+}
+
+.speedBar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to right, 
+    transparent, 
+    transparent 20%, 
+    rgba(64, 153, 255, 0.1) 20%, 
+    rgba(64, 153, 255, 0.1) 40%, 
+    rgba(64, 153, 255, 0.2) 40%, 
+    rgba(64, 153, 255, 0.2) 60%,
+    rgba(64, 153, 255, 0.3) 60%, 
+    rgba(64, 153, 255, 0.3) 80%, 
+    rgba(64, 153, 255, 0.4) 80%);
+  z-index: 0;
+}
+
+.speedFill {
+  height: 100%;
+  background: linear-gradient(to right, 
+    rgba(137, 214, 255, 0.8), 
+    var(--hud-primary));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px var(--hud-glow);
+  position: relative;
+  z-index: 1;
+}
+
+.speedFill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.1),
+      rgba(255, 255, 255, 0.1) 5px,
+      transparent 5px,
+      transparent 10px
+    );
+  z-index: 1;
+  animation: moveStripes 15s linear infinite;
+}
+
+.speedFill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+  z-index: 2;
+}
+
+.speedValue {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 18px;
+  color: var(--hud-primary);
+  text-shadow: 0 0 5px var(--hud-glow);
+  font-weight: bold;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Декоративные элементы рамки с улучшенной анимацией */
+.frameTopLeft,
+.frameTopRight,
+.frameBottomLeft,
+.frameBottomRight {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  border-color: var(--hud-primary);
+  opacity: 0.7;
+  animation: pulseOpacity 4s infinite alternate;
+}
+
+.frameTopLeft {
+  top: 10px;
+  left: 10px;
+  border-top: 2px solid;
+  border-left: 2px solid;
+  animation-delay: 0s;
+}
+
+.frameTopLeft::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 5px;
+  height: 5px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--hud-accent);
+  animation: blink 2s infinite;
+}
+
+.frameTopRight {
+  top: 10px;
+  right: 10px;
+  border-top: 2px solid;
+  border-right: 2px solid;
+  animation-delay: 1s;
+}
+
+.frameTopRight::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--hud-accent);
+  animation: blink 2s infinite;
+  animation-delay: 0.5s;
+}
+
+.frameBottomLeft {
+  bottom: 10px;
+  left: 10px;
+  border-bottom: 2px solid;
+  border-left: 2px solid;
+  animation-delay: 2s;
+}
+
+.frameBottomLeft::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: -2px;
+  width: 5px;
+  height: 5px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--hud-accent);
+  animation: blink 2s infinite;
+  animation-delay: 1s;
+}
+
+.frameBottomRight {
+  bottom: 10px;
+  right: 10px;
+  border-bottom: 2px solid;
+  border-right: 2px solid;
+  animation-delay: 3s;
+}
+
+.frameBottomRight::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--hud-accent);
+  animation: blink 2s infinite;
+  animation-delay: 1.5s;
+}
+
+/* Расширенные анимации для элементов HUD */
+@keyframes fadeIn {
+  from { opacity: 0; filter: blur(5px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; filter: blur(5px); }
+  to { transform: translateY(0); opacity: 1; filter: blur(0); }
+}
+
+@keyframes slideRight {
+  from { transform: translate(-50px, -50%); opacity: 0; filter: blur(5px); }
+  to { transform: translate(0, -50%); opacity: 1; filter: blur(0); }
+}
+
+@keyframes slideLeft {
+  from { transform: translate(50px, -50%); opacity: 0; filter: blur(5px); }
+  to { transform: translate(0, -50%); opacity: 1; filter: blur(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px var(--hud-primary); }
+  50% { box-shadow: 0 0 15px var(--hud-primary); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes blinkFast {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes scanlineAnimation {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 1200px; }
+}
+
+@keyframes hologramSweep {
+  0% { opacity: 0; transform: translateX(-100%); }
+  50% { opacity: 0.3; }
+  100% { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes moveStripes {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 0; }
+}
+
+@keyframes moveChevron {
+  0% { background-position: 0 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Глитч-эффект для важных элементов */
+.glitchEffect {
+  position: relative;
+  overflow: hidden;
+}
+
+.glitchEffect::before {
+  content: attr(data-text);
+  position: absolute;
+  left: -2px;
+  text-shadow: 2px 0 var(--hud-accent);
+  top: 0;
+  color: var(--hud-text);
+  background: transparent;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.glitchEffect::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 2px;
+  text-shadow: -2px 0 var(--hud-warning);
+  top: 0;
+  color: var(--hud-text);
+  background: transparent;
+  overflow: hidden;
+  clip: rect(0, 900px, 0, 0);
+  animation: glitch-anim2 4s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% { clip: rect(30px, 9999px, 10px, 0); transform: skew(0.2deg); }
+  5% { clip: rect(95px, 9999px, 95px, 0); transform: skew(0.1deg); }
+  10% { clip: rect(5px, 9999px, 17px, 0); transform: skew(0.3deg); }
+  15% { clip: rect(90px, 9999px, 90px, 0); transform: skew(0.1deg); }
+  20% { clip: rect(10px, 9999px, 15px, 0); transform: skew(0.2deg); }
+  25% { clip: rect(40px, 9999px, 29px, 0); transform: skew(0.5deg); }
+  30% { clip: rect(30px, 9999px, 15px, 0); transform: skew(0.1deg); }
+  35% { clip: rect(2px, 9999px, 25px, 0); transform: skew(0.3deg); }
+  40% { clip: rect(65px, 9999px, 85px, 0); transform: skew(0.1deg); }
+  45% { clip: rect(40px, 9999px, 20px, 0); transform: skew(0.4deg); }
+  50% { clip: rect(45px, 9999px, 11px, 0); transform: skew(0.2deg); }
+  55% { clip: rect(99px, 9999px, 30px, 0); transform: skew(0.3deg); }
+  60% { clip: rect(25px, 9999px, 55px, 0); transform: skew(0.1deg); }
+  65% { clip: rect(75px, 9999px, 25px, 0); transform: skew(0.4deg); }
+  70% { clip: rect(45px, 9999px, 70px, 0); transform: skew(0.2deg); }
+  75% { clip: rect(85px, 9999px, 43px, 0); transform: skew(0.5deg); }
+  80% { clip: rect(95px, 9999px, 15px, 0); transform: skew(0.3deg); }
+  85% { clip: rect(40px, 9999px, 95px, 0); transform: skew(0.1deg); }
+  90% { clip: rect(85px, 9999px, 85px, 0); transform: skew(0.5deg); }
+  95% { clip: rect(80px, 9999px, 60px, 0); transform: skew(0.2deg); }
+  100% { clip: rect(15px, 9999px, 15px, 0); transform: skew(0.3deg); }
+}
+
+@keyframes glitch-anim2 {
+  0% { clip: rect(15px, 9999px, 25px, 0); transform: skew(0.2deg); }
+  5% { clip: rect(65px, 9999px, 35px, 0); transform: skew(0.4deg); }
+  10% { clip: rect(15px, 9999px, 25px, 0); transform: skew(0.1deg); }
+  15% { clip: rect(60px, 9999px, 10px, 0); transform: skew(0.3deg); }
+  20% { clip: rect(90px, 9999px, 75px, 0); transform: skew(0.2deg); }
+  25% { clip: rect(10px, 9999px, 25px, 0); transform: skew(0.1deg); }
+  30% { clip: rect(50px, 9999px, 35px, 0); transform: skew(0.5deg); }
+  35% { clip: rect(15px, 9999px, 75px, 0); transform: skew(0.3deg); }
+  40% { clip: rect(45px, 9999px, 55px, 0); transform: skew(0.2deg); }
+  45% { clip: rect(10px, 9999px, 85px, 0); transform: skew(0.1deg); }
+  50% { clip: rect(35px, 9999px, 45px, 0); transform: skew(0.4deg); }
+  55% { clip: rect(85px, 9999px, 10px, 0); transform: skew(0.3deg); }
+  60% { clip: rect(15px, 9999px, 15px, 0); transform: skew(0.2deg); }
+  65% { clip: rect(55px, 9999px, 50px, 0); transform: skew(0.4deg); }
+  70% { clip: rect(40px, 9999px, 30px, 0); transform: skew(0.2deg); }
+  75% { clip: rect(45px, 9999px, 85px, 0); transform: skew(0.1deg); }
+  80% { clip: rect(50px, 9999px, 95px, 0); transform: skew(0.5deg); }
+  85% { clip: rect(20px, 9999px, 15px, 0); transform: skew(0.3deg); }
+  90% { clip: rect(55px, 9999px, 30px, 0); transform: skew(0.2deg); }
+  95% { clip: rect(20px, 9999px, 80px, 0); transform: skew(0.1deg); }
+  100% { clip: rect(45px, 9999px, 75px, 0); transform: skew(0.4deg); }
+}
+
+/* Нижний левый информационный блок */
+.bottomLeftInfo {
+  position: absolute;
+  left: 20px;
+  bottom: 20px;
+  font-size: 12px;
+  color: var(--hud-text);
+  background-color: rgba(8, 19, 39, 0.4);
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  animation: fadeIn 1s ease-out;
+  text-shadow: 0 0 3px rgba(64, 153, 255, 0.5);
+  max-width: 200px;
+}
+
+.bottomLeftInfo::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(to right, var(--hud-secondary), transparent);
+}
+
+.bottomLeftInfo::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  right: 0;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(to left, var(--hud-secondary), transparent);
+}
+
+.infoTag {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.infoTag::before {
+  content: '//';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 9px;
+  color: var(--hud-accent);
+}
+
+.infoLine {
+  margin: 4px 0;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  font-family: 'Share Tech Mono', monospace;
+  opacity: 0.85;
+}
+
+.infoLine span {
+  color: var(--hud-primary);
+  margin-left: 2px;
+  font-weight: 500;
+}
+
+.statusOnline {
+  color: var(--hud-secondary) !important;
+  animation: blink 3s infinite;
+  position: relative;
+  padding-left: 12px;
+}
+
+.statusOnline::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: var(--hud-secondary);
+  animation: pulseOpacity 2s infinite;
+}
+
+/* Нижний правый информационный блок */
+.bottomRightInfo {
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  font-size: 12px;
+  color: var(--hud-text);
+  background-color: rgba(8, 19, 39, 0.4);
+  border: 1px solid var(--hud-border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  animation: fadeIn 1s ease-out;
+  text-shadow: 0 0 3px rgba(64, 153, 255, 0.5);
+  max-width: 200px;
+}
+
+.bottomRightInfo::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: 0;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(to left, var(--hud-secondary), transparent);
+}
+
+.bottomRightInfo::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(to right, var(--hud-secondary), transparent);
+}
+
+.microData {
+  margin: 5px 0;
+}
+
+.dataRow {
+  display: flex;
+  align-items: center;
+  margin: 3px 0;
+  font-size: 10px;
+}
+
+.dataLabel {
+  width: 30px;
+  color: var(--hud-secondary);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.dataBar {
+  width: 70px;
+  height: 5px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 0 5px;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+}
+
+.dataBar > div {
+  height: 100%;
+  background: linear-gradient(to right, var(--hud-primary), var(--hud-accent));
+  transition: width 0.5s ease;
+}
+
+.dataValue {
+  width: 30px;
+  text-align: right;
+  font-size: 9px;
+  opacity: 0.8;
+}
+
+.sectorInfo {
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  line-height: 1.3;
+  opacity: 0.8;
+}
+
+.sectorInfo span {
+  color: var(--hud-primary);
+  font-weight: 500;
+}
+
+.scanActive {
+  color: var(--hud-warning) !important;
+  animation: blinkFast 0.5s infinite;
+}
+
+.loadingMap {
+  width: 100%;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(5, 15, 30, 0.6);
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  border-radius: 3px;
+  margin-top: 10px;
+}
+
+.loadingText {
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(150, 210, 255, 0.7);
+  font-size: 14px;
+  letter-spacing: 1px;
+  animation: blink 1.2s infinite alternate;
+}
+
+/* Стили для пограничной информации снизу экрана */
+.borderInfo {
+  position: absolute;
+  bottom: 25px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 0 20px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: rgba(173, 232, 255, 0.75);
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 4px rgba(64, 153, 255, 0.5);
+  z-index: 20;
+}
+
+.borderInfoLeft, .borderInfoRight {
+  background-color: rgba(8, 19, 39, 0.5);
+  padding: 3px 12px;
+  border-radius: 3px;
+  border-top: 1px solid rgba(64, 153, 255, 0.3);
+  box-shadow: 0 0 8px rgba(64, 153, 255, 0.2);
+}
+
+/* Стили для кнопки открытия информации о корабле */
+.shipInfoButton {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(5, 20, 45, 0.85);
+  border: 1px solid rgba(64, 153, 255, 0.5);
+  color: rgba(173, 232, 255, 0.95);
+  font-family: 'Share Tech Mono', monospace;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.4), 
+    inset 0 0 8px rgba(64, 153, 255, 0.2);
+  outline: none;
+  pointer-events: all;
+  z-index: 100;
+  overflow: hidden;
+  height: 32px;
+  min-width: 130px;
+}
+
+.shipInfoButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    rgba(64, 153, 255, 0), 
+    rgba(64, 153, 255, 0.8), 
+    rgba(64, 153, 255, 0));
+  z-index: 3;
+}
+
+.shipInfoButton::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    rgba(64, 153, 255, 0), 
+    rgba(64, 153, 255, 0.4), 
+    rgba(64, 153, 255, 0));
+  z-index: 3;
+}
+
+.buttonContent {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+}
+
+.buttonIcon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.iconRing {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(72, 255, 237, 0.6);
+  border-radius: 50%;
+  animation: pulseRing 3s infinite;
+}
+
+.iconCircle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--hud-accent);
+  animation: pulseCircle 2s infinite alternate;
+}
+
+.buttonText {
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba(64, 153, 255, 0.8);
+  position: relative;
+  font-weight: bold;
+}
+
+.buttonText::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right,
+    transparent,
+    rgba(72, 255, 237, 0.5),
+    transparent
+  );
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.buttonStatus {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--hud-accent);
+  margin-left: 8px;
+  opacity: 0.7;
+  position: relative;
+}
+
+.buttonStatus::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -8px;
+  width: 6px;
+  height: 1px;
+  background-color: rgba(72, 255, 237, 0.6);
+}
+
+.buttonEffect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right, 
+    transparent, 
+    rgba(72, 255, 237, 0.05), 
+    transparent
+  );
+  z-index: 1;
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+/* Стили для ховера */
+.shipInfoButton:hover {
+  background-color: rgba(10, 35, 70, 0.9);
+  box-shadow: 
+    0 0 20px rgba(64, 153, 255, 0.6), 
+    inset 0 0 10px rgba(72, 255, 237, 0.3);
+  border-color: rgba(72, 255, 237, 0.8);
+}
+
+.shipInfoButton:hover .buttonText::after {
+  transform: scaleX(1);
+}
+
+.shipInfoButton:hover .buttonEffect {
+  transform: translateX(100%);
+}
+
+.shipInfoButton:hover .iconCircle {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+/* Стили для активного состояния */
+.shipInfoButton:active {
+  transform: translateX(-50%) scale(0.97);
+  background-color: rgba(15, 50, 100, 0.95);
+}
+
+/* Анимации для элементов кнопки */
+@keyframes pulseRing {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(0.8); opacity: 0.5; }
+}
+
+@keyframes pulseCircle {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+/* Новая верхняя визуальная панель */
+.topSystemPanel {
+  position: relative;
+  width: 500px;
+  height: 130px;
+  background-color: rgba(5, 15, 32, 0.85);
+  border: 1px solid rgba(57, 137, 255, 0.4);
+  border-radius: 2px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  box-shadow: 
+    0 0 15px rgba(40, 107, 233, 0.3),
+    inset 0 0 20px rgba(0, 10, 40, 0.6);
+  overflow: hidden;
+  animation: fadeIn 1.2s ease-out;
+  pointer-events: auto;
+  position: absolute;
+  left: 700px;
+  top: -20px;
+  z-index: 5;
+}
+
+.topSystemPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(to bottom,
+      rgba(64, 153, 255, 0.05) 0%, 
+      rgba(10, 37, 90, 0.05) 30%,
+      rgba(10, 37, 90, 0.08) 60%, 
+      rgba(40, 107, 233, 0.05) 100%
+    );
+  z-index: 1;
+  pointer-events: none;
+}
+
+.topSystemPanel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(57, 137, 255, 0.8), 
+    transparent
+  );
+  animation: scanline-horizontal 4s linear infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.systemPanelHeader {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px 5px;
+  border-bottom: 1px solid rgba(57, 137, 255, 0.3);
+}
+
+.systemPanelHeader::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(57, 137, 255, 0.05), 
+    rgba(57, 137, 255, 0.5), 
+    rgba(57, 137, 255, 0.05)
+  );
+}
+
+.systemIndicator {
+  font-size: 13px;
+  font-weight: bold;
+  color: rgba(136, 214, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(40, 107, 233, 0.8);
+  position: relative;
+  padding-left: 15px;
+}
+
+.systemIndicator::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background-color: rgba(57, 137, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(57, 137, 255, 0.8);
+  animation: system-pulse 2s infinite;
+}
+
+.systemCode {
+  font-size: 12px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(72, 255, 237, 0.8);
+  letter-spacing: 2px;
+  opacity: 0.8;
+}
+
+.systemPanelContent {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 15px;
+  align-items: center;
+  height: calc(100% - 40px);
+  position: relative;
+}
+
+.quantumReadout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 30%;
+  position: relative;
+}
+
+.quantumWave {
+  width: 100%;
+  height: 40px;
+  background-color: rgba(10, 37, 90, 0.3);
+  border: 1px solid rgba(57, 137, 255, 0.3);
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.quantumWave::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(57, 137, 255, 0.5);
+  z-index: 1;
+}
+
+.quantumWave::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 2px,
+    rgba(57, 137, 255, 0.1) 2px,
+    rgba(57, 137, 255, 0.1) 4px
+  );
+  z-index: 2;
+  animation: quantum-wave-bg 10s linear infinite;
+}
+
+.quantumData {
+  font-size: 22px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: bold;
+  color: rgba(72, 255, 237, 0.9);
+  text-shadow: 0 0 10px rgba(72, 255, 237, 0.7);
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.quantumMetric {
+  font-size: 10px;
+  font-weight: normal;
+  color: rgba(136, 214, 255, 0.7);
+  margin-left: 5px;
+  letter-spacing: 0;
+  vertical-align: super;
+}
+
+.systemVisualizer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  width: 35%;
+  height: 60px;
+  padding: 0 10px;
+  border-left: 1px dashed rgba(57, 137, 255, 0.2);
+  border-right: 1px dashed rgba(57, 137, 255, 0.2);
+}
+
+.visualizerBar {
+  width: 8px;
+  background: linear-gradient(
+    to top,
+    rgba(57, 137, 255, 0.7),
+    rgba(72, 255, 237, 0.7)
+  );
+  transition: height 0.3s ease, opacity 0.5s ease;
+  border-radius: 2px 2px 0 0;
+  position: relative;
+}
+
+.visualizerBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(72, 255, 237, 0.9);
+  box-shadow: 0 0 8px rgba(72, 255, 237, 0.8);
+}
+
+.systemStats {
+  display: flex;
+  flex-direction: column;
+  width: 30%;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 10px;
+  color: rgba(136, 214, 255, 0.8);
+  letter-spacing: 0.5px;
+}
+
+.statRow span:first-child {
+  color: rgba(136, 214, 255, 0.6);
+  font-size: 11px;
+}
+
+.statValue {
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(72, 255, 237, 0.9);
+  font-weight: bold;
+}
+
+.systemCorners {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  z-index: 3;
+}
+
+.cornerTL {
+  top: 0;
+  left: 0;
+  border-top: 2px solid rgba(72, 255, 237, 0.8);
+  border-left: 2px solid rgba(72, 255, 237, 0.8);
+}
+
+.cornerTR {
+  top: 0;
+  right: 0;
+  border-top: 2px solid rgba(72, 255, 237, 0.8);
+  border-right: 2px solid rgba(72, 255, 237, 0.8);
+}
+
+.cornerBL {
+  bottom: 0;
+  left: 0;
+  border-bottom: 2px solid rgba(72, 255, 237, 0.8);
+  border-left: 2px solid rgba(72, 255, 237, 0.8);
+}
+
+.cornerBR {
+  bottom: 0;
+  right: 0;
+  border-bottom: 2px solid rgba(72, 255, 237, 0.8);
+  border-right: 2px solid rgba(72, 255, 237, 0.8);
+}
+
+@keyframes scanline-horizontal {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(130px); }
+}
+
+@keyframes system-pulse {
+  0%, 100% { opacity: 0.8; box-shadow: 0 0 5px rgba(57, 137, 255, 0.5); }
+  50% { opacity: 1; box-shadow: 0 0 12px rgba(57, 137, 255, 0.9); }
+}
+
+@keyframes quantum-wave-bg {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 0; }
+}
+
+.sidePanelLeft, .sidePanelRight {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  background-color: rgba(0, 15, 30, 0.7);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 15px;
+  box-sizing: border-box;
+  opacity: 0;
+  animation: fadeInSidePanel 1s forwards;
+  animation-delay: 0.5s;
+  z-index: 1;
+  overflow: hidden;
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.sidePanelLeft {
+  left: 0;
+  border-right: 1px solid rgba(64, 153, 255, 0.3);
+}
+
+.sidePanelRight {
+  right: 0;
+  border-left: 1px solid rgba(64, 153, 255, 0.3);
+  animation: fadeInSidePanelRight 1s forwards;
+  animation-delay: 0.5s;
+}
+
+/* Новые стили для улучшенной панели DRIVE SYSTEMS */
+.driveSystemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid rgba(64, 153, 255, 0.3);
+  position: relative;
+}
+
+.driveSystemHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(64, 153, 255, 0.05), 
+    rgba(64, 153, 255, 0.5), 
+    rgba(64, 153, 255, 0.05)
+  );
+}
+
+.driveSystemIndicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  color: var(--hud-text);
+  letter-spacing: 1px;
+}
+
+.indicatorLight {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--hud-accent);
+  box-shadow: 0 0 8px var(--hud-accent);
+  animation: pulse 2s infinite alternate;
+}
+
+.driveSystemCode {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  background-color: rgba(8, 19, 39, 0.6);
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  letter-spacing: 1px;
+}
+
+.speedDirection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  background-color: rgba(8, 19, 39, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(64, 153, 255, 0.2);
+}
+
+.directionLabel {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  letter-spacing: 1px;
+}
+
+.driveStats {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.driveStat {
+  flex: 1;
+  background-color: rgba(8, 19, 39, 0.3);
+  padding: 3px 5px;
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.2);
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+}
+
+.driveStat span:first-child {
+  font-size: 8px;
+  color: var(--hud-secondary);
+  margin-bottom: 2px;
+  letter-spacing: 1px;
+}
+
+.driveStatValue {
+  color: var(--hud-accent);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: right;
+}
+
+.speedGauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.gaugeRing {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid rgba(64, 153, 255, 0.4);
+  margin-bottom: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(8, 19, 39, 0.3);
+  box-shadow: 
+    0 0 15px rgba(64, 153, 255, 0.2),
+    inset 0 0 20px rgba(8, 19, 39, 0.6);
+}
+
+.gaugeRing::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid rgba(64, 153, 255, 0.2);
+  background: 
+    linear-gradient(90deg, 
+      rgba(64, 153, 255, 0.1) 0%, 
+      rgba(64, 153, 255, 0) 50%, 
+      rgba(64, 153, 255, 0.1) 100%
+    );
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.gaugeNotch {
+  position: absolute;
+  width: 2px;
+  height: 6px;
+  background-color: rgba(64, 153, 255, 0.6);
+  top: 50%;
+  left: 50%;
+  transform-origin: center bottom;
+  transform: rotate(0deg) translateY(-35px);
+  transition: opacity 0.3s ease;
+}
+
+.gaugeNotch:nth-child(3n) {
+  height: 12px;
+  width: 3px;
+  background-color: var(--hud-primary);
+}
+
+.gaugeNeedle {
+  position: absolute;
+  width: 3px;
+  height: 35px;
+  background: linear-gradient(to top, var(--hud-accent), transparent);
+  top: 50%;
+  left: calc(50% - 1.5px);
+  transform-origin: bottom center;
+  transform: rotate(0deg);
+  transition: transform 0.5s ease;
+  z-index: 2;
+}
+
+.gaugeNeedle::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  top: 2px;
+  left: -3px;
+  border-style: solid;
+  border-width: 0 4.5px 12px 4.5px;
+  border-color: transparent transparent var(--hud-accent) transparent;
+  transform: rotate(180deg);
+}
+
+.gaugeCenter {
+  width: 12px;
+  height: 12px;
+  background-color: var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--hud-accent);
+  z-index: 3;
+  position: relative;
+}
+
+.gaugeCenter::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: -4px;
+  left: -4px;
+  border-radius: 50%;
+  border: 1px solid rgba(72, 255, 237, 0.3);
+  pointer-events: none;
+}
+
+.gaugeValue {
+  position: absolute;
+  bottom: 18px;
+  font-size: 18px;
+  font-family: 'Orbitron', sans-serif;
+  color: var(--hud-accent);
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(72, 255, 237, 0.5);
+}
+
+.gaugeMax {
+  position: absolute;
+  bottom: 5px;
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--hud-text);
+  opacity: 0.7;
+}
+
+.speedBarContainer {
+  width: 100%;
+  margin-top: 5px;
+  position: relative;
+}
+
+.speedBarLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+  font-size: 10px;
+  color: var(--hud-text);
+  opacity: 0.7;
+}
+
+.speedBar {
+  height: 6px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 3px;
+  border: 1px solid var(--hud-border);
+  position: relative;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.speedNotch {
+  position: absolute;
+  width: 1px;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.3);
+  top: 0;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.speedPercent {
+  text-align: center;
+  font-size: 12px;
+  color: var(--hud-text);
+  letter-spacing: 1px;
+}
+
+.driveSystemDivider {
+  position: relative;
+  margin: 10px 0;
+  height: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.dividerLabel {
+  position: absolute;
+  font-size: 9px;
+  background-color: rgba(8, 19, 39, 0.8);
+  padding: 0 8px;
+  color: var(--hud-secondary);
+  letter-spacing: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.dividerLine {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(64, 153, 255, 0.1), 
+    rgba(64, 153, 255, 0.5), 
+    rgba(64, 153, 255, 0.1)
+  );
+}
+
+.systemsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.progressHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3px;
+}
+
+.progressNotch {
+  position: absolute;
+  width: 1px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  top: 0;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+
+.energyIndicators {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.energyCell {
+  width: 25px;
+  height: 5px;
+  background-color: var(--hud-secondary);
+  border-radius: 1px;
+  transition: opacity 0.3s ease, background-color 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 5px rgba(72, 255, 237, 0.4);
+}
+
+.energyCell::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+}
+
+.shieldDisplay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5px;
+  gap: 8px;
+}
+
+.shieldIcon {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shieldOuter, .shieldInner {
+  position: absolute;
+  border-radius: 50%;
+  border: 2px solid var(--hud-secondary);
+  transition: opacity 0.3s ease, border-color 0.3s ease;
+}
+
+.shieldOuter {
+  width: 18px;
+  height: 18px;
+  animation: shieldPulse 3s infinite alternate;
+}
+
+.shieldInner {
+  width: 10px;
+  height: 10px;
+  animation: shieldPulse 3s infinite alternate-reverse;
+}
+
+.shieldStatus {
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--hud-accent);
+  letter-spacing: 1px;
+}
+
+.driveSystemCorners {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+@keyframes shieldPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* Дополнительные стили для компактной панели DRIVE SYSTEMS */
+.driveSystemContent {
+  position: relative;
+  font-size: 90%;
+}
+
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.speedInfo {
+  width: 55%;
+}
+
+.speedBarLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: var(--hud-text);
+  opacity: 0.7;
+  margin-bottom: 3px;
+}
+
+/* Улучшенные стили для панели ADNOS SYSTEM v1.0 */
+.systemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.versionBadge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: rgba(8, 19, 39, 0.7);
+  padding: 3px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+}
+
+.buildNumber {
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--hud-secondary);
+  letter-spacing: 0.5px;
+}
+
+.statusLight {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--hud-accent);
+  box-shadow: 0 0 5px var(--hud-accent);
+  animation: pulse 2s infinite alternate;
+}
+
+.systemGrid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.systemMetrics {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.metricRow {
+  position: relative;
+}
+
+.systemIndicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.3s ease;
+}
+
+.indicatorDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+  animation: pulse 2s infinite alternate;
+}
+
+.microProgress {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 3px;
+}
+
+.microProgressLabel {
+  font-size: 9px;
+  color: var(--hud-text);
+  opacity: 0.8;
+  width: 28px;
+}
+
+.microProgressBar {
+  flex: 1;
+  height: 4px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.microProgressBar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  z-index: 2;
+}
+
+.microProgressFill {
+  height: 100%;
+  background: linear-gradient(to right, 
+    var(--hud-secondary), 
+    var(--hud-accent));
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.microProgressValue {
+  font-size: 9px;
+  color: var(--hud-text);
+  opacity: 0.8;
+  width: 25px;
+  text-align: right;
+}
+
+.systemDiagnostics {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.diagnosticCircle {
+  width: 50px;
+  height: 50px;
+  position: relative;
+}
+
+.systemFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(64, 153, 255, 0.2);
+  padding-top: 5px;
+}
+
+.systemData {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.dataLabel {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  letter-spacing: 0.5px;
+}
+
+.dataValue {
+  font-size: 10px;
+  color: var(--hud-text);
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.pinger {
+  width: 18px;
+  height: 18px;
+  background-color: rgba(8, 19, 39, 0.6);
+  border-radius: 50%;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.pinger::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    rgba(64, 153, 255, 0.1) 0%,
+    rgba(64, 153, 255, 0) 70%
+  );
+  animation: pinger-wave 4s infinite;
+}
+
+.pingDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--hud-accent);
+  animation: ping-pulse 2s infinite;
+}
+
+@keyframes pinger-wave {
+  0%, 100% { transform: scale(1); opacity: 0; }
+  50% { transform: scale(1.8); opacity: 0.3; }
+}
+
+@keyframes ping-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 2px var(--hud-accent); }
+  50% { transform: scale(1.5); box-shadow: 0 0 8px var(--hud-accent); }
+}
+
+/* Стили для улучшенной панели NAVIGATION */
+.navHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.navStatus {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: var(--hud-secondary);
+  background-color: rgba(8, 19, 39, 0.5);
+  padding: 3px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.2);
+}
+
+.statusIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--hud-secondary);
+  box-shadow: 0 0 5px var(--hud-secondary);
+  animation: pulse 2s infinite alternate;
+}
+
+.navGridContainer {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 10px;
+  height: calc(100% - 80px);
+}
+
+.navCoordinatesPanel {
+  background-color: rgba(8, 15, 33, 0.4);
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  border-radius: 4px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.navPanelTitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--hud-primary);
+  margin-bottom: 5px;
+  border-bottom: 1px solid rgba(64, 153, 255, 0.2);
+  padding-bottom: 5px;
+  letter-spacing: 1px;
+  position: relative;
+}
+
+.navPanelTitle::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    rgba(64, 153, 255, 0.05), 
+    rgba(64, 153, 255, 0.3), 
+    rgba(64, 153, 255, 0.05)
+  );
+}
+
+.panelIcon {
+  width: 8px;
+  height: 8px;
+  background-color: var(--hud-accent);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  animation: rotateSlow 10s linear infinite;
+}
+
+.coordinatesGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.coordinateRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 5px;
+  background-color: rgba(8, 19, 39, 0.4);
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.15);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.coordinateRow:hover {
+  background-color: rgba(10, 30, 60, 0.4);
+  transform: translateX(3px);
+}
+
+.coordinateRow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background-color: var(--hud-accent);
+  opacity: 0.5;
+}
+
+.coordAxisTag {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 20, 40, 0.6);
+  color: var(--hud-accent);
+  font-weight: bold;
+  font-size: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+}
+
+.coordValue {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 14px;
+  color: var(--hud-text);
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+}
+
+.coordValueActive {
+  color: var(--hud-accent);
+  text-shadow: 0 0 5px rgba(72, 255, 237, 0.5);
+}
+
+.coordIndicator {
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0, 20, 40, 0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+}
+
+.coordArrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-bottom: 8px solid var(--hud-accent);
+  transform-origin: center;
+  transition: transform 0.5s ease, opacity 0.3s;
+}
+
+.navDataBar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  background-color: rgba(0, 20, 40, 0.3);
+  padding: 5px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.15);
+}
+
+.navDataItem {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+}
+
+.navDataLabel {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  opacity: 0.8;
+  margin-bottom: 3px;
+  letter-spacing: 1px;
+}
+
+.navDataValue {
+  color: var(--hud-text);
+  letter-spacing: 1px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.systemScanStatus {
+  margin-top: 5px;
+  padding: 5px 8px;
+  background-color: rgba(0, 20, 40, 0.3);
+  border-radius: 3px;
+  border: 1px solid rgba(64, 153, 255, 0.15);
+}
+
+.scanTitle {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  margin-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+.scanBar {
+  height: 4px;
+  background-color: rgba(8, 15, 33, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 5px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.4);
+}
+
+.scanProgress {
+  height: 100%;
+  background: linear-gradient(to right, 
+    var(--hud-secondary), 
+    var(--hud-accent));
+  position: relative;
+  transition: width 0.5s ease;
+}
+
+.scanProgress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  animation: pulseBrightness 1s infinite;
+}
+
+.scanInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  margin-top: 5px;
+}
+
+.scanLabel {
+  color: var(--hud-text);
+  opacity: 0.8;
+}
+
+.scanValue {
+  color: var(--hud-accent);
+  font-weight: bold;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.navMapContainer {
+  position: relative;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  border-radius: 4px;
+  overflow: hidden;
+  min-height: 140px;
+}
+
+.navMapDecoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.mapCorner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--hud-accent);
+  opacity: 0.8;
+}
+
+.mapCorner:nth-child(1) {
+  top: 5px;
+  left: 5px;
+  border-top: 1px solid;
+  border-left: 1px solid;
+}
+
+.mapCorner:nth-child(2) {
+  top: 5px;
+  right: 5px;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}
+
+.mapCorner:nth-child(3) {
+  bottom: 5px;
+  left: 5px;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+}
+
+.mapCorner:nth-child(4) {
+  bottom: 5px;
+  right: 5px;
+  border-bottom: 1px solid;
+  border-right: 1px solid;
+}
+
+.mapOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.mapGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, rgba(64, 153, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(64, 153, 255, 0.1) 1px, transparent 1px);
+  opacity: 0.5;
+}
+
+.mapTargetingReticle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--hud-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--hud-accent);
+  transition: all 0.3s ease;
+}
+
+.mapTargetingReticle::before,
+.mapTargetingReticle::after {
+  content: '';
+  position: absolute;
+  background-color: var(--hud-accent);
+}
+
+.mapTargetingReticle::before {
+  top: 50%;
+  left: -5px;
+  right: -5px;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.mapTargetingReticle::after {
+  left: 50%;
+  top: -5px;
+  bottom: -5px;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.navFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding: 5px 0;
+  border-top: 1px solid rgba(64, 153, 255, 0.2);
+}
+
+.navMode {
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+}
+
+.navModeLabel {
+  font-size: 9px;
+  color: var(--hud-secondary);
+  opacity: 0.8;
+  margin-bottom: 2px;
+}
+
+.navModeValue {
+  color: var(--hud-accent);
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+.mapControlButtons {
+  display: flex;
+  gap: 5px;
+}
+
+.mapControlBtn {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 20, 40, 0.6);
+  color: var(--hud-text);
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: all;
+}
+
+.mapControlBtn:hover {
+  background-color: rgba(10, 30, 60, 0.8);
+  color: var(--hud-accent);
+  box-shadow: 0 0 5px var(--hud-accent);
+}
+
+.navDecorations {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  opacity: 0.7;
+}
+
+.navDecorLine {
+  width: 2px;
+  height: 6px;
+  background-color: var(--hud-accent);
+}
+
+.navDecorLine:nth-child(2) {
+  height: 12px;
+}
+
+.navDecorLine:nth-child(3) {
+  height: 4px;
+  margin-top: -1px;
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseBrightness {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

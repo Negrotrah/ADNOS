@@ -1,0 +1,104 @@
+.galaxyMapContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.mapTitle {
+  font-size: 14px;
+  color: rgb(150, 210, 255);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  position: relative;
+  padding-left: 15px;
+  letter-spacing: 1px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.mapTitle::before {
+  content: '▮';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 10px;
+  color: rgba(36, 214, 184, 0.9);
+  animation: blink 3s infinite alternate;
+}
+
+.mapBox {
+  width: 180px;
+  height: 140px;
+  position: relative;
+  border: 1px solid rgba(64, 153, 255, 0.3);
+  background-color: rgba(5, 15, 30, 0.3);
+  margin-bottom: 5px;
+  overflow: hidden;
+  border-radius: 3px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.mapBox::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(64, 153, 255, 0.8), 
+    transparent);
+  z-index: 2;
+}
+
+.mapBox::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, 
+    transparent, 
+    rgba(64, 153, 255, 0.4), 
+    transparent);
+  z-index: 2;
+}
+
+.mapLegend {
+  display: flex;
+  font-size: 10px;
+  color: rgba(170, 210, 255, 0.7);
+  font-family: 'Share Tech Mono', monospace;
+  padding: 2px 5px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(0, 255, 170, 0.9);
+  margin-right: 5px;
+  box-shadow: 0 0 4px rgba(0, 255, 170, 0.6);
+}
+
+.legendText {
+  letter-spacing: 0.5px;
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+} 
